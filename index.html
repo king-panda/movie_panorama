@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ja">
   <head>
-    <title>Gyro Panorama Example</title>
+    <title>Movie Panorama Example</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
@@ -9,28 +9,48 @@
         margin: 0px;
         overflow: hidden;
       }
+      #buttonbar{
+        position: fixed;
+        bottom:50px;
+        right:50px;
+      }
+      #play{
+        width: 60px;
+      	height: 60px;
+      	background: #F26964;
+      	border: 3px solid #fff;
+      	border-radius: 70px;
+      	-moz-border-radius: 70px;
+      	-webkit-border-radius: 70px;
+      	color: #fff;
+        line-height: 60px;
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+        cursor: pointer;
+      }
+      #play:hover{
+        opacity: 0.8;
+      }
     </style>
   </head>
   <body>
     <div id="stage"></div>
 
+    <div id="buttonbar">
+      <div id="play">||</div>
+    </div>
+
   <script src="three.min.js"></script>
-  <script src="DeviceOrientationControls.js"></script>
   <script src="OrbitControls.js"></script>
 
-
   <script>
-(function(){
-
-  var ua = navigator.userAgent;
-    if (ua.indexOf('iPhone') > 0 || ua.indexOf('iPod') > 0 || ua.indexOf('Android') > 0) {
-        var sp = true;
-    }else if(ua.indexOf('iPad') > 0 || ua.indexOf('Android') > 0){
-        var sp = true;
-    }
+  (function(){
 
   var width = window.innerWidth,
       height = window.innerHeight;
+
+  var button;
 
   //scene
 
@@ -41,19 +61,21 @@
   var geometry = new THREE.SphereGeometry( 5, 60, 40 );
 	geometry.scale( - 1, 1, 1 );
 
+    //動画
 
   var video = document.createElement( 'video' );
   video.width = 640;
   video.height = 360;
   video.autoplay = true;
-  video.loop = false;
-  video.setAttribute("controls","");
+  video.loop = true;
   video.src = "test.MP4";
 
   var texture = new THREE.VideoTexture( video );
   texture.minFilter = THREE.LinearFilter;
 
   var material   = new THREE.MeshBasicMaterial( { map : texture } );
+
+    //静止画
 
 	/*var material = new THREE.MeshBasicMaterial( {
 	   map: THREE.ImageUtils.loadTexture( 'test.jpg' )
@@ -85,25 +107,17 @@
 
   //control
 
-  if(sp){
-    var gcontrols = new THREE.DeviceOrientationControls(camera, renderer.domElement);
-  }else{
-    var controls = new THREE.OrbitControls(camera, renderer.domElement);
-  }
-
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
   function render(){
     requestAnimationFrame(render);
     window.addEventListener( 'resize', onWindowResize, false );
     renderer.render(scene,camera);
 
-    if(sp){
-      gcontrols.connect();
-      gcontrols.update();
-    }else{
-      sphere.rotation.y += 0.05 * Math.PI/180;
-      controls.update();
-    }
+    button = document.getElementById("play");
+    button.addEventListener( 'click', vidplay, false );
+
+    controls.update();
   }
   render();
   function onWindowResize() {
@@ -112,9 +126,21 @@
 		renderer.setSize( window.innerWidth, window.innerHeight );
 	}
 
-})();
+  function vidplay() {
+       if (video.paused) {
+          video.play();
+          button.textContent = "||";
+          button.style.backgroundColor = "#F26964";
+       } else {
+          video.pause();
+          button.textContent = ">";
+          button.style.backgroundColor = "#1253A4";
+       }
+    }
+
+  })();
 
 
   </script>
-  </body>
+</body>
 </html>
